@@ -265,9 +265,9 @@ def denoise(index_list,data,wavefunc,lv,m,n):
 
     @return
     denoised values stored in the data dictionary with a key named 'denoised_values'"""
-    coeff = pywt.wavedec(index_list,wavefunc,mode='sym',level=lv)   # 按 level 层分解，使用pywt包进行计算， cAn是尺度系数 cDn为小波系数
+    coeff = pywt.wavedec(index_list,wavefunc,mode='sym',level=lv)
     sgn = lambda x: 1 if x > 0 else -1 if x < 0 else 0
-    for i in range(m,n+1):   # select m to n level 选取小波系数层数为 m~n层，尺度系数不需要处理
+    for i in range(m,n+1):   # select m to n level
         cD = coeff[i]
         for j in range(len(cD)):
             Tr = np.sqrt(2*np.log(len(cD)))  # calculate the threshold
@@ -277,59 +277,6 @@ def denoise(index_list,data,wavefunc,lv,m,n):
                 coeff[i][j] = 0   # if the value lower than threshold, set the value to 0
     denoised_values = pywt.waverec(coeff,wavefunc)
     data['denoised_values']=denoised_values
-
-
-def find_peaks(y, thres=0.3, min_dist=1):
-    if isinstance(y, np.ndarray) and np.issubdtype(y.dtype, np.unsignedinteger):
-        raise ValueError("y must be signed")
-
-    thres = thres * (np.max(y) - np.min(y)) + np.min(y)
-    min_dist = int(min_dist)
-
-    # compute first order difference
-    dy = np.diff(y)
-
-    # propagate left and right values successively to fill all plateau pixels (0-value)
-    zeros,=np.where(dy == 0)
-
-    # check if the singal is totally flat
-    if len(zeros) == len(y) - 1:
-        return np.array([])
-
-    while len(zeros):
-        # add pixels 2 by 2 to propagate left and right value onto the zero-value pixel
-        zerosr = np.hstack([dy[1:], 0.])
-        zerosl = np.hstack([0., dy[:-1]])
-
-        # replace 0 with right value if non zero
-        dy[zeros]=zerosr[zeros]
-        zeros,=np.where(dy == 0)
-
-        # replace 0 with left value if non zero
-        dy[zeros]=zerosl[zeros]
-        zeros,=np.where(dy == 0)
-
-    # find the peaks by using the first order difference
-    peaks = np.where((np.hstack([dy, 0.]) < 0.)
-                     & (np.hstack([0., dy]) > 0.)
-                     & (y > thres))[0]
-
-    # handle multiple peaks, respecting the minimum distance
-    if peaks.size > 1 and min_dist > 1:
-        highest = peaks[np.argsort(y[peaks])][::-1]
-        rem = np.ones(y.size, dtype=bool)
-        rem[peaks] = False
-
-        for peak in highest:
-            if not rem[peak]:
-                sl = slice(max(0, peak - min_dist), peak + min_dist + 1)
-                rem[sl] = True
-                rem[peak] = False
-
-        peaks = np.arange(y.size)[~rem]
-
-    return peaks
-
 
 
 
