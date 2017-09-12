@@ -2,6 +2,6 @@
 
 Analyse real data with high noisy to identify peaks 
 
-Before running it, following package need be install first
+Before running it, following package need be installed first
 
 >pip install matplotlib pip install pandas pip install PyWavelets
