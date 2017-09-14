@@ -176,7 +176,7 @@ def measurePeak(channel, peaks_index, thres=0.2):
     # print("peaks_index2 value: ", peaks_index)
     for i in peaks_index:
         peak_value = values[i]
-# depend on left value to find peaks
+    # depend on left value to find peaks
         if i < 10:
             diff_l = peak_value - values[0]
         else:
@@ -187,7 +187,7 @@ def measurePeak(channel, peaks_index, thres=0.2):
         else:
             minNum_l = min(values[(i-70):i])
 
-# depend on right value to find peaks
+    # depend on right value to find peaks
         data_len = len(values)
         if i > data_len - 70:
             diff_r = peak_value - values[data_len-1]
